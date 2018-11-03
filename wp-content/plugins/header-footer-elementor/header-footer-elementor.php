@@ -1,18 +1,18 @@
 <?php
 /**
- * Plugin Name:     Header Footer Elementor
+ * Plugin Name:     Header, Footer & Blocks for Elementor
  * Plugin URI:      https://github.com/Nikschavan/header-footer-elementor
  * Description:     Create Header and Footer for your site using Elementor Page Builder.
  * Author:          Brainstorm Force, Nikhil Chavan
  * Author URI:      https://www.brainstormforce.com/
  * Text Domain:     header-footer-elementor
  * Domain Path:     /languages
- * Version:         1.0.16
+ * Version:         1.1.1
  *
  * @package         header-footer-elementor
  */
 
-define( 'HFE_VER', '1.0.16' );
+define( 'HFE_VER', '1.1.1' );
 define( 'HFE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'HFE_URL', plugins_url( '/', __FILE__ ) );
 define( 'HFE_PATH', plugin_basename( __FILE__ ) );

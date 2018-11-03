@@ -58,8 +58,13 @@ class Header_Footer_Elementor {
 
 			// Scripts and styles.
 			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+
 			add_filter( 'body_class', array( $this, 'body_class' ) );
 			add_action( 'switch_theme', array( $this, 'reset_unsupported_theme_notice' ) );
+
+			add_shortcode( 'hfe_template', array( $this, 'render_template' ) );
 
 		} else {
 
@@ -155,6 +160,20 @@ class Header_Footer_Elementor {
 	}
 
 	/**
+	 * Load admin styles on header footer elementor edit screen.
+	 */
+	public function enqueue_admin_scripts() {
+		global $pagenow;
+		$screen = get_current_screen();
+
+		if ( ( 'elementor-hf' == $screen->id && ( 'post.php' == $pagenow || 'post-new.php' == $pagenow ) ) || ( 'edit.php' == $pagenow && 'edit-elementor-hf' == $screen->id ) ) {
+			wp_enqueue_style( 'hfe-admin-style', HFE_URL . 'admin/assets/css/ehf-admin.css', array(), HFE_VER );
+
+			wp_enqueue_script( 'hfe-admin-script', HFE_URL . 'admin/assets/js/ehf-admin.js', array(), HFE_VER );
+		}
+	}
+
+	/**
 	 * Adds classes to the body tag conditionally.
 	 *
 	 * @param  Array $classes array with class names for the body tag.
@@ -223,7 +242,7 @@ class Header_Footer_Elementor {
 	 * @return mixed.
 	 */
 	public static function get_settings( $setting = '', $default = '' ) {
-		if ( 'type_header' == $setting || 'type_footer' == $setting ) {
+		if ( 'type_header' == $setting || 'type_footer' == $setting || 'type_before_footer' == $setting ) {
 			$templates = self::get_template_id( $setting );
 
 			$template = is_array( $templates ) ? $templates[0] : '';
@@ -281,6 +300,38 @@ class Header_Footer_Elementor {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Callback to shortcode.
+	 *
+	 * @param array $atts attributes for shortcode.
+	 */
+	public function render_template( $atts ) {
+
+		$atts = shortcode_atts(
+			array(
+				'id' => '',
+			),
+			$atts,
+			'hfe_template'
+		);
+
+		$id = ! empty( $atts['id'] ) ? intval( $atts['id'] ) : '';
+
+		if ( empty( $id ) ) {
+			return '';
+		}
+
+		if ( class_exists( '\Elementor\Post_CSS_File' ) ) {
+
+			// Load elementor styles.
+			$css_file = new \Elementor\Post_CSS_File( $id );
+			$css_file->enqueue();
+		}
+
+		return self::$elementor_instance->frontend->get_builder_content_for_display( $id );
+
 	}
 
 }
